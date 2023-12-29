@@ -16,7 +16,7 @@ const GamePage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold">Asteroids Game</h1>
+        <h1 className="text-3xl font-bold">Asteroids</h1>
       </div>
 
       <GameCanvas />

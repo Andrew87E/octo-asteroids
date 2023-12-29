@@ -23,7 +23,7 @@ const GameCanvas = () => {
 
   const resetGame = () => {
     setHealth(3);
-    setCurrentLevel(0);
+    setCurrentLevel(1);
     // setAsteroids(initializeAsteroids());
     setIsGameOver(false); // Reset the game over flag
   };
@@ -56,10 +56,27 @@ const GameCanvas = () => {
     return newAsteroids;
   };
 
+  const disableScrollKeys = (event: KeyboardEvent) => {
+    const keysToPreventDefault = [
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "Space",
+      " ",
+    ];
+    if (keysToPreventDefault.includes(event.key)) {
+      event.preventDefault();
+    }
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
+
+    canvas.addEventListener("keydown", disableScrollKeys);
+    canvas.focus(); // Focus the canvas to receive key events
 
     const fullHeartImage = new Image();
     fullHeartImage.src = "/heart.png";
@@ -305,6 +322,7 @@ const GameCanvas = () => {
       document.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("resize", setCanvasSize);
       cancelAnimationFrame(animationFrameId);
+      canvas.removeEventListener("keydown", disableScrollKeys);
     };
   }, [currentLevel, health, isGameOver]);
 
@@ -343,7 +361,7 @@ const GameCanvas = () => {
       ref={parentDivRef}
       className="w-full max-w-6xl max-h-[75vh] min-h-[50vh] bg-gray-700 mb-6"
     >
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} tabIndex={0} />
     </div>
   );
 };
