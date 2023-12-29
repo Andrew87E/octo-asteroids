@@ -1,22 +1,13 @@
 {
-  "name": "asteroids",
-  "version": "0.0.0",
+  "name": "ateroids",
+  "version": "0.1.0",
   "private": true,
-  "description": "An asteroids game built with Next.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Andrew87E/octo-asteroids.git"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
-  "main": "dist/index.js",
-  "keywords": [],
-  "author": "andrew87e",
-  "license": "MIT",
   "dependencies": {
     "react": "^18",
     "react-dom": "^18",
@@ -32,8 +23,5 @@
     "tailwindcss": "^3.3.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.4"
-  },
-  "bugs": {
-    "url": "https://github.com/Andrew87E/octo-asteroids/issues"
   }
 }
