@@ -11,6 +11,7 @@ type SpaceShip = {
   speed: number;
 };
 
+// Game canvas component
 const GameCanvas = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [levelCompleted, setLevelCompleted] = useState(false);
@@ -28,12 +29,14 @@ const GameCanvas = () => {
     setIsGameOver(false); // Reset the game over flag
   };
 
+  // distance between points
   const distanceBetween = (x1: number, y1: number, x2: number, y2: number) => {
     const dx = x2 - x1;
     const dy = y2 - y1;
     return Math.sqrt(dx * dx + dy * dy);
   };
 
+  // Initialize asteroids for the current level
   const initializeAsteroids = (spaceship: SpaceShip) => {
     const canvas = canvasRef.current;
     if (!canvas) return [];
@@ -56,6 +59,7 @@ const GameCanvas = () => {
     return newAsteroids;
   };
 
+  // Disable scrolling when the user presses the arrow keys
   const disableScrollKeys = (event: KeyboardEvent) => {
     const keysToPreventDefault = [
       "ArrowUp",
@@ -70,32 +74,36 @@ const GameCanvas = () => {
     }
   };
 
+  // Game logic
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!canvas || !context) return;
+    const canvas = canvasRef.current; // Get the canvas element
+    const context = canvas?.getContext("2d"); // Get the context
+    if (!canvas || !context) return; // Stop if canvas or context is null
 
+    // Disable scrolling when the user presses the arrow keys
     canvas.addEventListener("keydown", disableScrollKeys);
     canvas.focus(); // Focus the canvas to receive key events
 
+    // Load images
     const fullHeartImage = new Image();
     fullHeartImage.src = "/heart.png";
-
     const brokenHeartImage = new Image();
     brokenHeartImage.src = "/broken.png";
 
+    // Animation frame ID
     let animationFrameId: number;
 
+    // Set canvas size
     const setCanvasSize = () => {
       canvas.width = parentDivRef.current?.clientWidth ?? window.innerWidth;
       canvas.height = parentDivRef.current?.clientHeight ?? window.innerHeight;
     };
 
+    // Set canvas size on load and on resize
     setCanvasSize();
-    window.addEventListener("resize", setCanvasSize);
+    window.addEventListener("resize", setCanvasSize); // Set canvas size on resize
 
-    // Initialize asteroids for the first level
-
+    // Initialize spaceship
     const spaceship: SpaceShip = {
       x: canvas.width / 2,
       y: canvas.height / 2,
@@ -104,14 +112,17 @@ const GameCanvas = () => {
       speed: 0,
     };
 
+    // Initialize asteroids
     setAsteroids(initializeAsteroids(spaceship));
 
+    // User input
     const userInput = {
       left: false,
       right: false,
       up: false,
     };
 
+    // Handle key down
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case " ":
@@ -136,6 +147,7 @@ const GameCanvas = () => {
       }
     };
 
+    // Handle key up
     const handleKeyUp = (event: KeyboardEvent) => {
       switch (event.key) {
         case "ArrowLeft":
@@ -198,8 +210,6 @@ const GameCanvas = () => {
       return false;
     };
 
-    // Distance between two points
-
     // Render level text
     const renderLevelText = (
       context: CanvasRenderingContext2D,
@@ -240,24 +250,24 @@ const GameCanvas = () => {
 
     // ~~ Game Loop ~~
     const gameLoop = () => {
+      // Check if the game is over before updating the game state
       if (isGameOver) {
         cancelAnimationFrame(animationFrameId); // Stop the game loop
         return;
       }
 
+      // Update spaceship
       if (userInput.left) spaceship.rotation -= 0.05;
       if (userInput.right) spaceship.rotation += 0.05;
-      if (userInput.up) spaceship.speed = 3;
+      if (userInput.up) spaceship.speed = 3; // Accelerate the spaceship forward
       else spaceship.speed = 0;
-
       spaceship.x += spaceship.speed * Math.cos(spaceship.rotation);
       spaceship.y += spaceship.speed * Math.sin(spaceship.rotation);
-
       spaceship.x = (spaceship.x + canvas.width) % canvas.width;
       spaceship.y = (spaceship.y + canvas.height) % canvas.height;
-
       context.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Draw spaceship
       context.save();
       context.translate(spaceship.x, spaceship.y);
       context.rotate(spaceship.rotation);
@@ -270,16 +280,19 @@ const GameCanvas = () => {
       context.fill();
       context.restore();
 
+      // Draw asteroids
       asteroids.forEach((asteroid) => {
         asteroid.update();
         asteroid.draw(context);
       });
 
+      // Handle asteroids going off screen
       asteroids.forEach((asteroid) => {
         asteroid.x = (asteroid.x + canvas.width) % canvas.width;
         asteroid.y = (asteroid.y + canvas.height) % canvas.height;
       });
 
+      // Draw bullets
       bullets.forEach((bullet, index) => {
         bullet.update();
         bullet.draw(context);
@@ -295,9 +308,11 @@ const GameCanvas = () => {
         }
       });
 
+      // Render level text and hearts
       renderLevelText(context, currentLevel, canvas.width);
       renderHearts(context, health);
 
+      // Check for collisions
       if (checkSpaceshipCollision(spaceship, asteroids)) {
         if (health === 0) {
           if (!isGameOver) {
@@ -308,24 +323,29 @@ const GameCanvas = () => {
         }
       }
 
+      // Check if the level is completed
       if (asteroids.length === 0 && !levelCompleted) {
         setLevelCompleted(true);
       }
 
+      // Request next frame
       animationFrameId = requestAnimationFrame(gameLoop);
     };
 
+    // Start the game loop
     animationFrameId = requestAnimationFrame(gameLoop);
 
+    // Clean up
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("resize", setCanvasSize);
-      cancelAnimationFrame(animationFrameId);
       canvas.removeEventListener("keydown", disableScrollKeys);
+      cancelAnimationFrame(animationFrameId); // Stop the game loop
     };
   }, [currentLevel, health, isGameOver]);
 
+  // handle level completion
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -337,6 +357,7 @@ const GameCanvas = () => {
       speed: 0,
     };
 
+    // Initialize asteroids
     if (levelCompleted) {
       setCurrentLevel((currentLevel) => currentLevel + 1);
       setAsteroids(initializeAsteroids(spaceship));
@@ -344,6 +365,7 @@ const GameCanvas = () => {
     }
   }, [levelCompleted, currentLevel]);
 
+  // handle game over
   return isGameOver ? (
     <div className="h-96 flex flex-col items-center justify-center bg-slate-800 w-[75vw] mb-16">
       <p className="text-4xl font-bold text-white mb-4">Game Over</p>
