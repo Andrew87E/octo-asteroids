@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import { Asteroid } from "./classes/asteroids";
 
 const GameCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,6 +91,22 @@ const GameCanvas = () => {
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
 
+    // Initialize asteroids
+    const asteroids: Asteroid[] = [];
+    const numberOfAsteroids = 5;
+
+    // Create asteroids
+    for (let i = 0; i < numberOfAsteroids; i++) {
+      const size = 20 + Math.random() * 30; // Random size between 20 and 50
+      asteroids.push(
+        new Asteroid(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height,
+          size
+        )
+      );
+    }
+
     // Game loop
     const gameLoop = () => {
       // Update game state
@@ -123,6 +140,26 @@ const GameCanvas = () => {
       context.fillStyle = "white";
       context.fill();
       context.restore();
+
+      // Update and draw asteroids
+      asteroids.forEach((asteroid) => {
+        asteroid.update();
+        asteroid.draw(context);
+      });
+
+      // asteroid wrap around logic
+      asteroids.forEach((asteroid) => {
+        asteroid.update();
+
+        // Wrap-around logic
+        if (asteroid.x > canvas.width) asteroid.x = 0;
+        else if (asteroid.x < 0) asteroid.x = canvas.width;
+
+        if (asteroid.y > canvas.height) asteroid.y = 0;
+        else if (asteroid.y < 0) asteroid.y = canvas.height;
+
+        asteroid.draw(context);
+      });
 
       // Request the next frame
       animationFrameId = requestAnimationFrame(gameLoop);
