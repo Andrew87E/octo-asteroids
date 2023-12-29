@@ -24,29 +24,48 @@ const GameCanvas = () => {
   const resetGame = () => {
     setHealth(3);
     setCurrentLevel(0);
-    setAsteroids(initializeAsteroids());
+    // setAsteroids(initializeAsteroids());
     setIsGameOver(false); // Reset the game over flag
   };
 
-  const initializeAsteroids = () => {
+  const distanceBetween = (x1: number, y1: number, x2: number, y2: number) => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const initializeAsteroids = (spaceship: SpaceShip) => {
     const canvas = canvasRef.current;
     if (!canvas) return [];
+
     const numAsteroids = asteroidsPerLevel[currentLevel - 1] || 5;
-    return Array.from(
-      { length: numAsteroids },
-      () =>
-        new Asteroid(
-          Math.random() * canvas.width,
-          Math.random() * canvas.height,
-          20 + Math.random() * 30
-        )
-    );
+    const minDistance = 100; // Minimum distance from the spaceship
+    let newAsteroids = [];
+
+    for (let i = 0; i < numAsteroids; i++) {
+      let x, y, dist;
+      do {
+        x = Math.random() * canvas.width;
+        y = Math.random() * canvas.height;
+        dist = distanceBetween(x, y, spaceship.x, spaceship.y);
+      } while (dist < minDistance);
+
+      newAsteroids.push(new Asteroid(x, y, 20 + Math.random() * 30));
+    }
+
+    return newAsteroids;
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
+
+    const fullHeartImage = new Image();
+    fullHeartImage.src = "/heart.png";
+
+    const brokenHeartImage = new Image();
+    brokenHeartImage.src = "/broken.png";
 
     let animationFrameId: number;
 
@@ -59,7 +78,6 @@ const GameCanvas = () => {
     window.addEventListener("resize", setCanvasSize);
 
     // Initialize asteroids for the first level
-    setAsteroids(initializeAsteroids());
 
     const spaceship: SpaceShip = {
       x: canvas.width / 2,
@@ -68,6 +86,8 @@ const GameCanvas = () => {
       rotation: 0,
       speed: 0,
     };
+
+    setAsteroids(initializeAsteroids(spaceship));
 
     const userInput = {
       left: false,
@@ -161,6 +181,8 @@ const GameCanvas = () => {
       return false;
     };
 
+    // Distance between two points
+
     // Render level text
     const renderLevelText = (
       context: CanvasRenderingContext2D,
@@ -185,10 +207,10 @@ const GameCanvas = () => {
       const padding = 10;
 
       for (let i = 0; i < totalHearts; i++) {
-        const heartImage = new Image();
-        heartImage.src = "/heart.png";
+        // Choose the image based on whether the heart is full or broken
+        const heartImage = i < health ? fullHeartImage : brokenHeartImage;
 
-        // we now have a heart image
+        // Draw the heart image
         context.drawImage(
           heartImage,
           10 + i * (heartSize + padding),
@@ -287,9 +309,19 @@ const GameCanvas = () => {
   }, [currentLevel, health, isGameOver]);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const spaceship: SpaceShip = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      size: 30,
+      rotation: 0,
+      speed: 0,
+    };
+
     if (levelCompleted) {
       setCurrentLevel((currentLevel) => currentLevel + 1);
-      setAsteroids(initializeAsteroids());
+      setAsteroids(initializeAsteroids(spaceship));
       setLevelCompleted(false);
     }
   }, [levelCompleted, currentLevel]);
