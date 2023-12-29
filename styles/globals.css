@@ -25,3 +25,21 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.game-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.control-button {
+  padding: 10px;
+  background-color: #ddd;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
