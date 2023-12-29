@@ -63,7 +63,7 @@ const GamePage = () => {
             </p>
             <p>
               Keep an eye on your health, represented by hearts at the top of
-              the screen. If you run out of health, it's game over!
+              the screen. If you run out of health, it&apos;s game over!
             </p>
           </div>
         )}
@@ -92,7 +92,9 @@ const GamePage = () => {
         {showTips && (
           <div>
             <ul className="list-disc list-inside mb-4">
-              <li>Move strategically and don't get cornered by asteroids.</li>
+              <li>
+                Move strategically and don&apos;t get cornered by asteroids.
+              </li>
               <li>
                 Use short bursts of movement to dodge asteroids effectively.
               </li>
