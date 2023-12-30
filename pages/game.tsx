@@ -108,27 +108,27 @@ const GamePage = () => {
         {isMobile ? (
           <div className="game-controls">
             <button
-              className="control-button left"
+              className="control-button left select-none"
               onTouchStart={() => handleKeydown("left")}
               onTouchEnd={() => handleKeyup("left")}
             >
               Left
             </button>
             <button
-              className="control-button right"
+              className="control-button right select-none"
               onTouchStart={() => handleKeydown("right")}
               onTouchEnd={() => handleKeyup("right")}
             >
               Right
             </button>
             <button
-              className="control-button up"
+              className="control-button up select-none"
               onTouchStart={() => handleKeydown("up")}
               onTouchEnd={() => handleKeyup("up")}
             >
               Up
             </button>
-            <button className="control-button shoot" onTouchStart={handleShoot}>
+            <button className="control-button shoot select-none" onTouchStart={handleShoot}>
               Shoot
             </button>
           </div>
